@@ -1,0 +1,49 @@
+UnifyJS, (C) Copyright 2011, Alexander Wilden (october dot rust at gmx dot de)
+
+UnifyJS is a very simple helper that unifies multiple asynchronous function calls in
+one wrapper. This wrapper allows to call a single callback when all of the functions
+have done their work, i.e. called their callbacks.
+
+As examples say more than words there can be found one here: http://jsfiddle.net/HfPAT/
+
+If that's not sufficient, here is some more text:
+(And if that's still not sufficient don't hesitate to contact me ;-))
+
+The only Object supplied by this library is Unify. You can call add() on it for as
+many asynchronous functions that should be called. add() expects at least two parameters:
+
+1. the asynchronous function object to invoke
+2. the position marker (Unify.CALLBACK) for the unify mechanism to inject its internal callback
+
+This is sufficient for all asynchronous functions that just need to have a callback as
+input parameter. Functions without any callback are not possible as their would be no
+way for unify to inject itself.
+
+So for this simple case it could look like this:
+
+Unify.add( myAsyncFunction, Unify.CALLBACK );
+
+If the function expects another parameter at the first position or some after the callback
+this could look like this:
+
+Unify.add( myAsyncFunction, firstArgument, Unify.CALLBACK, thirdArgument, forthArgument );
+
+It is even possible to have a function that expects different callbacks for different outcomes.
+Yet it should be noted (and perhaps clear), that unify cannot directly react on these
+outcomes and interpret them. This has to been done after invocation.
+A simple case could be this:
+
+Unify.add( myAsyncFunction, firstArgument, Unify.CALLBACK, Unify.CALLBACK );
+
+As add() returns the unified object multiple asynchronous functions are chained via add and
+directly invoked with the function that should be called when all asynchronous functions are
+done:
+
+Unify.add( myAsyncFunction, Unify.CALLBACK )
+     .add( myAsyncFunction, firstArgument, Unify.CALLBACK, thirdArgument, forthArgument )
+     .add( myAsyncFunction, firstArgument, Unify.CALLBACK, Unify.CALLBACK );
+     .invoke( function( results ) {
+        // do something with the results
+     } );
+
+
