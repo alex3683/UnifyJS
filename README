@@ -39,11 +39,27 @@ As add() returns the unified object multiple asynchronous functions are chained 
 directly invoked with the function that should be called when all asynchronous functions are
 done:
 
-Unify.add( myAsyncFunction, Unify.CALLBACK )
-     .add( myAsyncFunction, firstArgument, Unify.CALLBACK, thirdArgument, forthArgument )
-     .add( myAsyncFunction, firstArgument, Unify.CALLBACK, Unify.CALLBACK );
+Unify.add( myAsyncFunction1, Unify.CALLBACK )
+     .add( myAsyncFunction2, firstArgument, Unify.CALLBACK, thirdArgument, forthArgument )
+     .add( myAsyncFunction3, firstArgument, Unify.CALLBACK, Unify.CALLBACK );
      .invoke( function( results ) {
         // do something with the results
      } );
 
+The function passed to invoke will receive exactly one argument. This is an array containing
+all the arguments passed to the invoked callback of each added, asynchronous function.
+To make it clear lets imagine that the three functions from above pass these arguments to
+their callbacks:
 
+myAsyncFunction1: 23
+myAsyncFunction2: 'foo', 'bar'
+myAsyncFunction3: true
+
+In this case result would look like this:
+  [[23], ['foo', 'bar'], [true]]
+
+No matter which asynchronous function finishes first, the order of resultlists matches the order
+in which the functions were added to the Unify object.
+
+If something remains unclear, please tell me.
+And if you are (un-)happy using this, tell me too :-)
