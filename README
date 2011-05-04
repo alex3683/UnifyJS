@@ -61,5 +61,15 @@ In this case result would look like this:
 No matter which asynchronous function finishes first, the order of resultlists matches the order
 in which the functions were added to the Unify object.
 
+In the case where callbacks are added in a loop chaining simply is not possible. For this case
+there is the Unify.create() method, which expects no parameters and simple creates a chainable
+Unify instance:
+
+var unified = Unify.create();
+for( ... ) {
+   unified.add( function() { ... }, ... );
+}
+unified.invoke( function( results )  { ... } );
+
 If something remains unclear, please tell me.
 And if you are (un-)happy using this, tell me too :-)
