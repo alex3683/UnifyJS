@@ -11,8 +11,8 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. All advertising materials mentioning features or use of this software
  *    must display the following acknowledgement:
- *    This product includes software developed by the <organization>.
- * 4. Neither the name of the <organization> nor the
+ *    This product includes software developed by Alexander Wilden.
+ * 4. Neither the name Alexander Wilden nor the
  *    names of its contributors may be used to endorse or promote products
  *    derived from this software without specific prior written permission.
  * 
@@ -49,8 +49,24 @@ var Unify = (function() {
       var callbackPositions = [];
       var args = Array.prototype.slice.call(arguments, 1);
       for (var i = 0; i < args.length; ++i) {
-         if (args[i] == CALLBACK) {
+         var arg = args[i];
+         if (arg === CALLBACK) {
             callbackPositions.push(i);
+         }
+         else if (isPlainObject(arg)) {
+            var argSpec = null;
+            for (var key in arg) {
+               if (arg[key] === CALLBACK) {
+                  argSpec = argSpec === null ? {
+                     'index': i,
+					 'keys': []
+                  } : argSpec;
+                  argSpec.keys.push(key);
+               }
+            }
+            if (argSpec !== null) {
+               callbackPositions.push(argSpec);
+            }
          }
       }
       
@@ -92,11 +108,26 @@ var Unify = (function() {
          var callbackPositions = invocation.callbackPositions;
          var args = invocation.args;
          for (var j = 0; j < callbackPositions.length; ++j) {
-            args[callbackPositions[j]] = callbackFunction(i);
+            var callbackPosition = callbackPositions[j];
+			
+            if (isPlainObject(callbackPosition)) {
+               var argObject = args[callbackPosition.index];
+               var keys = callbackPosition.keys;
+               for (var k = 0; k < keys.length; ++k) {
+                  argObject[keys[k]] = callbackFunction(i);
+               }
+            }
+            else {
+               args[callbackPosition] = callbackFunction(i);
+            }
          }
          invocation.func.apply({}, args);
       }
    };
+   
+   function isPlainObject(obj) {
+      return (Object.prototype.toString.call(obj) === '[object Object]');
+   }
    
    return {
    
