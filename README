@@ -21,42 +21,42 @@ way for unify to inject itself.
 
 So for this simple case it could look like this:
 
-Unify.add( myAsyncFunction, Unify.CALLBACK );
+    Unify.add( myAsyncFunction, Unify.CALLBACK );
 
 If the function expects another parameter at the first position or some after the callback
 this could look like this:
 
-Unify.add( myAsyncFunction, firstArgument, Unify.CALLBACK, thirdArgument, forthArgument );
+    Unify.add( myAsyncFunction, firstArgument, Unify.CALLBACK, thirdArgument, forthArgument );
 
 It is even possible to have a function that expects different callbacks for different outcomes.
 Yet it should be noted (and perhaps clear), that unify cannot directly react on these
 outcomes and interpret them. This has to been done after invocation.
 A simple case could be this:
 
-Unify.add( myAsyncFunction, firstArgument, Unify.CALLBACK, Unify.CALLBACK );
+    Unify.add( myAsyncFunction, firstArgument, Unify.CALLBACK, Unify.CALLBACK );
 
 As add() returns the unified object multiple asynchronous functions are chained via add and
 directly invoked with the function that should be called when all asynchronous functions are
 done:
 
-Unify.add( myAsyncFunction1, Unify.CALLBACK )
-     .add( myAsyncFunction2, firstArgument, Unify.CALLBACK, thirdArgument, forthArgument )
-     .add( myAsyncFunction3, firstArgument, Unify.CALLBACK, Unify.CALLBACK );
-     .invoke( function( results ) {
-        // do something with the results
-     } );
+    Unify.add( myAsyncFunction1, Unify.CALLBACK )
+         .add( myAsyncFunction2, firstArgument, Unify.CALLBACK, thirdArgument, forthArgument )
+         .add( myAsyncFunction3, firstArgument, Unify.CALLBACK, Unify.CALLBACK );
+         .invoke( function( results ) {
+            // do something with the results
+         } );
 
 The function passed to invoke will receive exactly one argument. This is an array containing
 all the arguments passed to the invoked callback of each added, asynchronous function.
 To make it clear lets imagine that the three functions from above pass these arguments to
 their callbacks:
 
-myAsyncFunction1: 23
-myAsyncFunction2: 'foo', 'bar'
-myAsyncFunction3: true
+    myAsyncFunction1: 23
+    myAsyncFunction2: 'foo', 'bar'
+    myAsyncFunction3: true
 
 In this case result would look like this:
-  [[23], ['foo', 'bar'], [true]]
+    [[23], ['foo', 'bar'], [true]]
 
 No matter which asynchronous function finishes first, the order of resultlists matches the order
 in which the functions were added to the Unify object.
@@ -65,11 +65,24 @@ In the case where callbacks are added in a loop chaining simply is not possible.
 there is the Unify.create() method, which expects no parameters and simple creates a chainable
 Unify instance:
 
-var unified = Unify.create();
-for( ... ) {
-   unified.add( function() { ... }, ... );
-}
-unified.invoke( function( results )  { ... } );
+    var unified = Unify.create();
+    for( ... ) {
+       unified.add( function() { ... }, ... );
+    }
+    unified.invoke( function( results )  { ... } );
 
 If something remains unclear, please tell me.
 And if you are (un-)happy using this, tell me too :-)
+
+UPDATE (9.5.2011):
+It is now even possible to have callbacks within object literals passed to an asynchronous function.
+A running example can be found here: http://jsfiddle.net/FYerW/
+
+So if a method expects an object with a functional argument and another property which is the callback,
+this could look like this:
+
+    Unify.add( myAsyncFunction, {
+             callback: Unify.CALLBACK,
+             arg: "foo"
+         } )
+         .invoke( function() { ... } );
