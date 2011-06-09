@@ -41,7 +41,7 @@ done:
 
     Unify.add( myAsyncFunction1, Unify.CALLBACK )
          .add( myAsyncFunction2, firstArgument, Unify.CALLBACK, thirdArgument, forthArgument )
-         .add( myAsyncFunction3, firstArgument, Unify.CALLBACK, Unify.CALLBACK );
+         .add( myAsyncFunction3, firstArgument, Unify.CALLBACK, Unify.CALLBACK )
          .invoke( function( results ) {
             // do something with the results
          } );
